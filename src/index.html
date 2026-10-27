@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'" />
+  <title>Lockodoro</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app" id="app" data-mode="focus" data-status="idle">
+
+    <header class="bar">
+      <div class="brand"><span class="live"></span>Lockodoro</div>
+      <div class="wctl">
+        <button id="sound" class="wbtn" title="Sound (M)">
+          <svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10z"/><path class="waves" d="M16 9.5a3.5 3.5 0 0 1 0 5M18.5 7a7 7 0 0 1 0 10"/></svg>
+        </button>
+        <button id="pin" class="wbtn on" title="Keep on top (P)">
+          <svg viewBox="0 0 24 24"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></svg>
+        </button>
+        <button id="min" class="wbtn" title="Minimize">
+          <svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg>
+        </button>
+        <button id="close" class="wbtn close" title="Close">
+          <svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <nav class="modes" id="modes">
+      <span class="thumb" id="thumb"></span>
+      <button data-mode="focus" class="active">Focus</button>
+      <button data-mode="short">Break</button>
+      <button data-mode="long">Long</button>
+    </nav>
+
+    <section class="plate">
+      <div class="time">
+        <span class="digit" id="d0"></span><span class="digit" id="d1"></span><span class="colon">:</span><span class="digit" id="d2"></span><span class="digit" id="d3"></span>
+      </div>
+      <div class="track"><span id="prog"></span></div>
+    </section>
+
+    <section class="row">
+      <div class="status" id="status"></div>
+      <div class="sessions" id="sessions" title="Sessions today"></div>
+    </section>
+
+    <blockquote class="quote" id="quote" title="Click for another">
+      <p></p>
+      <cite></cite>
+    </blockquote>
+
+    <footer class="foot">
+      <button id="reset" class="icon" title="Reset (R)">
+        <svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.1-5M5 4v4h4"/></svg>
+      </button>
+      <button id="go" class="go">
+        <span class="fill"></span>
+        <span class="glow"></span>
+        <svg class="lock" viewBox="0 0 24 24">
+          <path class="shackle" d="M8 11V7.5a4 4 0 0 1 8 0V11"/>
+          <rect x="5.5" y="11" width="13" height="9.5" rx="3"/>
+        </svg>
+        <span class="label" id="label">Lock in</span>
+      </button>
+      <button id="skip" class="icon" title="Skip (S)">
+        <svg viewBox="0 0 24 24"><path d="M6 6.5l7.5 5.5L6 17.5zM17 6.5v11"/></svg>
+      </button>
+    </footer>
+
+    <div class="veil" id="veil">
+      <div class="ring"></div>
+      <div class="stamp">
+        <svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V7.5a4 4 0 0 1 8 0V11"/><rect x="5.5" y="11" width="13" height="9.5" rx="3"/></svg>
+        <span>locked in</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="quotes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
