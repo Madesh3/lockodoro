@@ -470,3 +470,108 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
 /* finished: a warm glow washes over the plate */
 .app.ding .plate { animation: ding 1.6s var(--soft); }
 @keyframes ding { 20% { box-shadow: var(--rim), 0 0 0 1px var(--gold-soft), 0 0 40px rgba(226,194,126,0.35); } }
+
+/* ───────── mini mode ───────── */
+.mini { display: none; }
+.app.compact {
+  padding: 0 12px 0 22px;
+  justify-content: center;
+  -webkit-app-region: drag;
+  animation: boot 0.9s var(--soft) both, morph-mini 16s ease-in-out infinite alternate;
+}
+@keyframes morph-mini {
+  0%   { border-radius: 30px 18px 28px 14px / 28px 22px 34px 20px; }
+  50%  { border-radius: 16px 32px 14px 30px / 34px 18px 28px 22px; }
+  100% { border-radius: 34px 14px 32px 20px / 20px 34px 22px 30px; }
+}
+.app.compact > :not(.mini):not(.veil) { display: none; }
+.app.compact .mini {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  grid-template-areas: "time . go grow" "status . go grow";
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 1px;
+}
+.mini-time {
+  grid-area: time;
+  display: flex;
+  align-items: baseline;
+  font-size: 34px;
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+  text-shadow: 0 0 18px rgba(255,255,255,0.12);
+  cursor: default;
+}
+.mini-time .digit { height: 1.08em; }
+.mini-status {
+  grid-area: status;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-3);
+  white-space: nowrap;
+  transition: color 0.5s var(--soft);
+}
+.app.locked .mini-status { color: var(--gold); }
+
+.mini-go {
+  grid-area: go;
+  position: relative;
+  width: 42px; height: 40px;
+  display: grid; place-items: center;
+  overflow: hidden;
+  border-radius: 60% 40% 56% 44% / 46% 60% 40% 54%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(236,231,220,0.88));
+  color: #17161a;
+  box-shadow: inset 0 1px 0 #fff, 0 8px 18px -10px rgba(255,255,255,0.45);
+  transition: transform 0.45s var(--spring), background 0.6s var(--soft), color 0.6s var(--soft), box-shadow 0.6s var(--soft), border-radius 0.9s var(--spring);
+}
+.mini-go:hover { border-radius: 42% 58% 40% 60% / 60% 42% 58% 40%; transform: translateY(-1px); }
+.mini-go:active { transform: scale(0.9); transition-duration: 0.12s; }
+.app.locked .mini-go {
+  background: linear-gradient(to bottom, rgba(226,194,126,0.18), rgba(226,194,126,0.06));
+  color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold-soft), 0 0 18px -6px rgba(226,194,126,0.4);
+}
+.mini-go .fill {
+  position: absolute; inset: 0;
+  background: rgba(226,194,126,0.35);
+  transform-origin: bottom;
+  transform: scaleY(0);
+  transition: transform 0.35s var(--soft);
+}
+.mini-go.holding .fill { transform: scaleY(1); transition: transform 1.1s cubic-bezier(0.4, 0, 0.6, 1); }
+.mini-go.holding { transform: scale(0.93); }
+.mini-go.nudge { animation: nudge 0.45s var(--soft); }
+.mini-go .lock { width: 17px; height: 17px; }
+
+.grow { grid-area: grow; align-self: center; }
+
+.mini-track {
+  position: absolute;
+  left: 0; right: 80px; bottom: -9px;
+  height: 2px;
+  border-radius: 99px 40px 99px 30px;
+  background: rgba(255,255,255,0.07);
+  overflow: hidden;
+}
+.mini-track span {
+  position: absolute; inset: 0;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: linear-gradient(to right, rgba(226,194,126,0.5), var(--gold));
+  transition: transform 0.6s linear;
+}
+
+/* the lock-in veil, sized down for the pill */
+.app.compact .stamp { flex-direction: row; gap: 8px; font-size: 20px; }
+.app.compact .stamp svg { width: 18px; height: 18px; }
+.app.compact .ring { width: 60px; height: 60px; margin: -30px 0 0 -30px; }
+
+/* switching between sizes: melt out, resize, melt back in */
+.app.melt { opacity: 0 !important; filter: blur(8px); transform: scale(0.94); transition: opacity 0.16s, filter 0.16s, transform 0.16s; }
+.app.unmelt { transition: opacity 0.5s var(--soft), filter 0.5s var(--soft), transform 0.6s var(--spring); }

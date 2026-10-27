@@ -15,6 +15,8 @@
     colon: $('.colon'), status: $('#status'), sessions: $('#sessions'),
     prog: $('#prog'), quote: $('#quote'), go: $('#go'), label: $('#label'),
     veil: $('#veil'), thumb: $('#thumb'),
+    miniDigits: [0, 1, 2, 3].map((i) => $('#m' + i)),
+    miniStatus: $('#miniStatus'), miniGo: $('#miniGo'), miniProg: $('#miniProg'),
   };
 
   // ───────── persisted bits ─────────
@@ -28,10 +30,11 @@
     endAt: 0,
     sessions: saved.date === today ? saved.sessions : 0,
     muted: !!saved.muted,
+    compact: !!saved.compact,
     busy: false, // true while the lock-in ceremony plays
   };
   const persist = () => {
-    try { localStorage.setItem('lockodoro', JSON.stringify({ date: today, sessions: state.sessions, muted: state.muted })); } catch {}
+    try { localStorage.setItem('lockodoro', JSON.stringify({ date: today, sessions: state.sessions, muted: state.muted, compact: state.compact })); } catch {}
   };
 
   // ───────── sound: soft, synthesized ─────────
@@ -98,6 +101,13 @@
   function setStatus(text) {
     if (text === statusText) return;
     statusText = text;
+    const mini = els.miniStatus;
+    mini.animate([{ opacity: 1 }, { opacity: 0, filter: 'blur(3px)' }], { duration: 160, easing: SOFT, fill: 'forwards' })
+      .onfinish = () => {
+        mini.textContent = text;
+        mini.getAnimations().forEach((a) => a.cancel());
+        mini.animate([{ opacity: 0, transform: 'translateY(5px)', filter: 'blur(3px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 450, easing: SOFT });
+      };
     const el = els.status;
     el.animate([{ opacity: 1 }, { opacity: 0, filter: 'blur(3px)', transform: 'translateY(-4px)' }], { duration: 180, easing: SOFT, fill: 'forwards' })
       .onfinish = () => {
@@ -151,9 +161,10 @@
     lastSec = sec;
     const str = pad(Math.floor(sec / 60)) + pad(sec % 60);
     els.digits.forEach((el, i) => setDigit(el, str[i], dir));
-    els.colon.classList.toggle('dim', sec % 2 === 1);
+    els.miniDigits.forEach((el, i) => setDigit(el, str[i], dir));
+    document.querySelectorAll('.colon').forEach((c) => c.classList.toggle('dim', sec % 2 === 1));
     const p = 1 - state.remaining / state.total;
-    els.prog.style.transform = `scaleX(${p})`;
+    els.prog.style.transform = els.miniProg.style.transform = `scaleX(${p})`;
     window.win?.progress(state.status === 'idle' ? -1 : p);
     const word = state.status === 'running' ? (state.mode === 'focus' ? 'Locked in' : 'Break') : 'Paused';
     document.title = state.status === 'idle' ? 'Lockodoro' : `${str.slice(0, 2)}:${str.slice(2)} · ${word}`;
@@ -262,24 +273,26 @@
   }
 
   // ───────── the big button ─────────
-  let holdTimer, swallowClick = false;
+  let holdTimer, holdBtn, swallowClick = false;
   const isLocked = () => state.mode === 'focus' && state.status === 'running';
+  const activeGo = () => (state.compact ? els.miniGo : els.go);
 
   function startHold(e) {
     if (!isLocked() || state.busy) return;
-    els.go.classList.add('holding');
+    holdBtn = e?.currentTarget instanceof HTMLElement ? e.currentTarget : activeGo();
+    holdBtn.classList.add('holding');
     holdTimer = setTimeout(() => {
-      els.go.classList.remove('holding');
+      holdBtn.classList.remove('holding');
       swallowClick = e?.type === 'pointerdown'; // the release will fire a click
       sfx.unlock();
       pause();
     }, HOLD_MS);
   }
   function cancelHold() {
-    if (!els.go.classList.contains('holding')) return;
+    if (!holdBtn?.classList.contains('holding')) return;
     clearTimeout(holdTimer);
-    els.go.classList.remove('holding');
-    restart(els.go, 'nudge'); // let go too early: a gentle "not yet"
+    holdBtn.classList.remove('holding');
+    restart(holdBtn, 'nudge'); // let go too early: a gentle "not yet"
   }
   function primary() {
     if (state.busy) return;
@@ -291,11 +304,36 @@
     state.status === 'running' ? pause() : run();
   }
 
-  els.go.addEventListener('pointerdown', startHold);
-  els.go.addEventListener('pointerup', cancelHold);
-  els.go.addEventListener('pointerleave', cancelHold);
-  els.go.addEventListener('click', primary);
+  [els.go, els.miniGo].forEach((btn) => {
+    btn.addEventListener('pointerdown', startHold);
+    btn.addEventListener('pointerup', cancelHold);
+    btn.addEventListener('pointerleave', cancelHold);
+    btn.addEventListener('click', primary);
+  });
 
+  // ───────── mini mode ─────────
+  let resizing = false;
+  async function setCompact(on, animate = true) {
+    if (resizing) return;
+    resizing = true;
+    state.compact = on;
+    persist();
+    if (animate) {
+      sfx.pop();
+      app.classList.remove('unmelt');
+      app.classList.add('melt');
+      await new Promise((r) => setTimeout(r, 170));
+    }
+    await window.win?.compact(on);
+    app.classList.toggle('compact', on);
+    requestAnimationFrame(() => {
+      app.classList.add('unmelt');
+      app.classList.remove('melt');
+      resizing = false;
+    });
+  }
+  $('#shrink').addEventListener('click', () => setCompact(true));
+  $('#grow').addEventListener('click', () => setCompact(false));
   $('#reset').addEventListener('click', () => { sfx.tap(); clearTimeout(tick); setMode(state.mode, { quote: false }); });
   $('#skip').addEventListener('click', () => {
     sfx.tap();
@@ -330,12 +368,15 @@
     else if (e.code === 'KeyS' && !isLocked()) $('#skip').click();
     else if (e.code === 'KeyM') soundBtn.click();
     else if (e.code === 'KeyP') pinBtn.click();
+    else if (e.code === 'KeyC') setCompact(!state.compact);
   });
   window.addEventListener('keyup', (e) => { if (e.code === 'Space') cancelHold(); });
 
   // ───────── boot ─────────
   els.digits.forEach((el) => setDigit(el, '0'));
+  els.miniDigits.forEach((el) => setDigit(el, '0'));
   syncSound();
+  if (state.compact) setCompact(true, false);
   document.fonts.ready.then(() => {
     setMode('focus', { quote: false });
     nextQuote();

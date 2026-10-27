@@ -12,6 +12,9 @@
     <header class="bar">
       <div class="brand"><span class="live"></span>Lockodoro</div>
       <div class="wctl">
+        <button id="shrink" class="wbtn" title="Mini mode (C)">
+          <svg viewBox="0 0 24 24"><path d="M14 10l6-6M14 10V5.5M14 10h4.5M10 14l-6 6M10 14v4.5M10 14H5.5"/></svg>
+        </button>
         <button id="sound" class="wbtn" title="Sound (M)">
           <svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10z"/><path class="waves" d="M16 9.5a3.5 3.5 0 0 1 0 5M18.5 7a7 7 0 0 1 0 10"/></svg>
         </button>
@@ -68,6 +71,24 @@
         <svg viewBox="0 0 24 24"><path d="M6 6.5l7.5 5.5L6 17.5zM17 6.5v11"/></svg>
       </button>
     </footer>
+
+    <section class="mini" id="mini">
+      <div class="mini-time">
+        <span class="digit" id="m0"></span><span class="digit" id="m1"></span><span class="colon">:</span><span class="digit" id="m2"></span><span class="digit" id="m3"></span>
+      </div>
+      <div class="mini-status"><span class="live"></span><span id="miniStatus"></span></div>
+      <button id="miniGo" class="mini-go" title="Lock in / hold to unlock">
+        <span class="fill"></span>
+        <svg class="lock" viewBox="0 0 24 24">
+          <path class="shackle" d="M8 11V7.5a4 4 0 0 1 8 0V11"/>
+          <rect x="5.5" y="11" width="13" height="9.5" rx="3"/>
+        </svg>
+      </button>
+      <button id="grow" class="wbtn grow" title="Expand (C)">
+        <svg viewBox="0 0 24 24"><path d="M20 4l-6 6M20 4v4.5M20 4h-4.5M4 20l6-6M4 20v-4.5M4 20h4.5"/></svg>
+      </button>
+      <span class="mini-track"><span id="miniProg"></span></span>
+    </section>
 
     <div class="veil" id="veil">
       <div class="ring"></div>

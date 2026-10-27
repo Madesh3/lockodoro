@@ -46,6 +46,18 @@ ipcMain.handle('win:pin', () => {
 });
 ipcMain.on('win:progress', (_e, value) => win?.setProgressBar(value));
 
+// mini mode: shrink/grow while keeping the bottom-right corner where it is
+const MINI = { width: 252, height: 96 };
+ipcMain.handle('win:compact', (_e, on) => {
+  const b = win.getBounds();
+  const size = on ? MINI : { width: W, height: H };
+  win.setBounds({
+    x: b.x + b.width - size.width,
+    y: b.y + b.height - size.height,
+    ...size,
+  });
+});
+
 app.setAppUserModelId('com.lockodoro.app');
 nativeTheme.themeSource = 'dark'; // keeps the acrylic tint dark
 app.whenReady().then(createWindow);
