@@ -56,6 +56,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
   padding: 2px 20px 18px;
   overflow: hidden;
   isolation: isolate;
+  /* grab anywhere to move; buttons opt out with no-drag */
+  -webkit-app-region: drag;
   border-radius: 62px 30px 68px 24px / 40px 62px 28px 70px;
   background:
     linear-gradient(170deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 40%),
@@ -305,7 +307,6 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round
   flex-direction: column;
   justify-content: center;
   padding: 6px 4px 10px;
-  cursor: pointer;
   transition: opacity 0.45s var(--soft), transform 0.45s var(--soft), filter 0.45s var(--soft);
 }
 .quote p {

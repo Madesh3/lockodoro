@@ -340,8 +340,6 @@
     clearTimeout(tick);
     setMode(state.mode === 'focus' ? 'short' : 'focus');
   });
-  els.quote.addEventListener('click', () => { sfx.tap(); nextQuote(); });
-
   document.querySelectorAll('.modes button').forEach((b) =>
     b.addEventListener('click', () => {
       if (isLocked() || (b.dataset.mode === state.mode && state.status === 'idle')) return;
